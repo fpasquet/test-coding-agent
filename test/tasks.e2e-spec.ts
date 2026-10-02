@@ -65,4 +65,32 @@ describe('Tasks (e2e)', () => {
       .delete(`/tasks/${created.body.id}`)
       .expect(204);
   });
+
+  it('returns 404 when getting a non-existent task', async () => {
+    await request(app.getHttpServer())
+      .get('/tasks/999')
+      .expect(404)
+      .expect((res) =>
+        expect(res.body.message).toBe('Task 999 not found'),
+      );
+  });
+
+  it('returns 404 when updating a non-existent task', async () => {
+    await request(app.getHttpServer())
+      .patch('/tasks/999')
+      .send({ done: true })
+      .expect(404)
+      .expect((res) =>
+        expect(res.body.message).toBe('Task 999 not found'),
+      );
+  });
+
+  it('returns 404 when deleting a non-existent task', async () => {
+    await request(app.getHttpServer())
+      .delete('/tasks/999')
+      .expect(404)
+      .expect((res) =>
+        expect(res.body.message).toBe('Task 999 not found'),
+      );
+  });
 });

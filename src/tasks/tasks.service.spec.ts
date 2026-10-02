@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { TasksService } from './tasks.service.js';
 
 describe('TasksService', () => {
@@ -42,6 +43,20 @@ describe('TasksService', () => {
     const task = service.create({ title: 'Temporary' });
     service.remove(task.id);
 
-    expect(service.findOne(task.id)).toBeUndefined();
+    expect(() => service.findOne(task.id)).toThrow(NotFoundException);
+  });
+
+  it('throws NotFoundException when finding a non-existent task', () => {
+    expect(() => service.findOne(999)).toThrow(NotFoundException);
+  });
+
+  it('throws NotFoundException when updating a non-existent task', () => {
+    expect(() => service.update(999, { done: true })).toThrow(
+      NotFoundException,
+    );
+  });
+
+  it('throws NotFoundException when removing a non-existent task', () => {
+    expect(() => service.remove(999)).toThrow(NotFoundException);
   });
 });

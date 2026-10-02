@@ -24,7 +24,7 @@ export class TasksController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Task | undefined {
+  findOne(@Param('id', ParseIntPipe) id: number): Task {
     return this.tasks.findOne(id);
   }
 
@@ -37,7 +37,7 @@ export class TasksController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTaskDto,
-  ): Task | undefined {
+  ): Task {
     return this.tasks.update(id, dto);
   }
 
