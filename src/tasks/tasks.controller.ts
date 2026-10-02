@@ -8,19 +8,26 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CreateTaskDto } from './create-task.dto.js';
 import type { Task } from './task.js';
 import { TasksService } from './tasks.service.js';
 import { UpdateTaskDto } from './update-task.dto.js';
+import { FindTasksQueryDto } from './find-tasks-query.dto.js';
+import type { PaginatedTasksDto } from './paginated-tasks.dto.js';
 
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasks: TasksService) {}
 
   @Get()
-  findAll(): Task[] {
-    return this.tasks.findAll();
+  findAll(
+    @Query(new ValidationPipe({ transform: true }))
+    query: FindTasksQueryDto,
+  ): PaginatedTasksDto {
+    return this.tasks.findAllPaginated(query.page, query.limit, query.done);
   }
 
   @Get(':id')

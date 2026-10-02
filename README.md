@@ -10,11 +10,32 @@ Les tâches sont gardées en mémoire : elles disparaissent à l'arrêt de l'app
 
 | Méthode  | Route        | Rôle                                                     |
 | -------- | ------------ | -------------------------------------------------------- |
-| `GET`    | `/tasks`     | Liste les tâches, dans l'ordre de création.              |
+| `GET`    | `/tasks`     | Liste les tâches, paginées, dans l'ordre de création.    |
 | `GET`    | `/tasks/:id` | Lit une tâche.                                           |
 | `POST`   | `/tasks`     | Crée une tâche : `{ "title": "…", "description": "…" }`. |
 | `PATCH`  | `/tasks/:id` | Modifie une tâche : `title`, `description`, `done`.      |
 | `DELETE` | `/tasks/:id` | Supprime une tâche.                                      |
+
+### Paramètres de `/tasks`
+
+| Paramètre | Type    | Valeurs            | Défaut | Notes                               |
+| --------- | ------- | ------------------ | ------ | ----------------------------------- |
+| `page`    | Entier  | ≥ 1                | `1`    | Numéro de la page.                  |
+| `limit`   | Entier  | 1 à 100            | `20`   | Nombre de tâches par page.          |
+| `done`    | Booléen | `true` ou `false`  | —      | Filtre optionnel sur l'état.        |
+
+Réponse :
+
+```json
+{
+  "items": [
+    { "id": 1, "title": "…", "description": "…", "done": false, "createdAt": "…" }
+  ],
+  "total": 42,
+  "page": 1,
+  "limit": 20
+}
+```
 
 ## Développer
 
