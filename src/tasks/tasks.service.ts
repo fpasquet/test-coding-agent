@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import type { CreateTaskDto } from './create-task.dto.js';
 import type { Task } from './task.js';
 import type { UpdateTaskDto } from './update-task.dto.js';
@@ -13,8 +13,10 @@ export class TasksService {
     return this.tasks;
   }
 
-  findOne(id: number): Task | undefined {
-    return this.tasks.find((task) => task.id === id);
+  findOne(id: number): Task {
+    const task = this.tasks.find((task) => task.id === id);
+    if (!task) throw new NotFoundException(`Task ${id} not found`);
+    return task;
   }
 
   create(dto: CreateTaskDto): Task {
@@ -29,14 +31,15 @@ export class TasksService {
     return task;
   }
 
-  update(id: number, dto: UpdateTaskDto): Task | undefined {
+  update(id: number, dto: UpdateTaskDto): Task {
     const task = this.findOne(id);
-    if (task) Object.assign(task, dto);
+    Object.assign(task, dto);
     return task;
   }
 
   remove(id: number): void {
+    this.findOne(id);
     const index = this.tasks.findIndex((task) => task.id === id);
-    if (index !== -1) this.tasks.splice(index, 1);
+    this.tasks.splice(index, 1);
   }
 }
