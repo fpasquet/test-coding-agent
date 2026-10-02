@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
@@ -12,6 +13,12 @@ describe('Tasks (e2e)', () => {
       imports: [AppModule],
     }).compile();
     app = moduleRef.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    );
     await app.init();
   });
 
@@ -64,5 +71,34 @@ describe('Tasks (e2e)', () => {
     await request(app.getHttpServer())
       .delete(`/tasks/${created.body.id}`)
       .expect(204);
+  });
+
+  it('rejects a task with an empty title', async () => {
+    await request(app.getHttpServer())
+      .post('/tasks')
+      .send({ title: '' })
+      .expect(400);
+  });
+
+  it('rejects a task with no title', async () => {
+    await request(app.getHttpServer())
+      .post('/tasks')
+      .send({})
+      .expect(400);
+  });
+
+  it('rejects a task with a title longer than 120 characters', async () => {
+    const longTitle = 'a'.repeat(121);
+    await request(app.getHttpServer())
+      .post('/tasks')
+      .send({ title: longTitle })
+      .expect(400);
+  });
+
+  it('rejects a request with an unknown field', async () => {
+    await request(app.getHttpServer())
+      .post('/tasks')
+      .send({ title: 'Test', unknownField: 'value' })
+      .expect(400);
   });
 });
